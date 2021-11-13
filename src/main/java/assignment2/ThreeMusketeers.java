@@ -16,7 +16,7 @@ public class ThreeMusketeers {
      * Default constructor to load Starter board
      */
     public ThreeMusketeers() {
-        this(new File("Boards/Starter.txt"));
+        this(new File("boards/Starter.txt"));
     }
 
     /**

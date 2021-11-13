@@ -230,6 +230,9 @@ public class View {
 			getMessageeeLabel("GUARD");
 			//this.boardPanel.changeCurrectSelect();
 		}
+		this.setUndoButton();
+		
+		
 		
 		
 		
@@ -240,7 +243,8 @@ public class View {
      */
     protected void setUndoButton() { // TODO
     	if (model.getMovesSize() == 0) {
-    		undoButton.disableProperty();
+    		undoButton.setDisable(true);
+    		
     	}
     	else {
     		undoButton.setDisable(false);
@@ -255,6 +259,7 @@ public class View {
      */
     protected void setGameMode(ThreeMusketeers.GameMode mode) { // TODO
     	this.gameMode = mode;
+    	gameModeLabel.setText(mode.getGameModeLabel());
 
     	if (mode.toString() == "Human") {
     		this.showBoard();
@@ -303,7 +308,13 @@ public class View {
      */
     private void undo() { // TODO
     	model.undoMove();
+    	this.setUndoButton();
     	this.boardPanel.updateCells();
+    	if ( ! (model.getCurrentAgent() instanceof HumanAgent)) {
+            model.move(model.getCurrentAgent());
+            this.runMove();
+            
+    	}
 
     }
 
@@ -317,13 +328,15 @@ public class View {
      * Must use saveFileSuccess, saveFileExistsError, or saveFileNotTxtError to set as the text of saveFileErrorLabel
      */
     private void saveBoard() { // TODO
+    	saveButton.setOnAction(e -> saveBoard());
     	if (this.saveFileNameTextField.getText().endsWith(".txt")) {
             String path = "boards" + File.separator + this.saveFileNameTextField.getText();
 
             File f = new File(path);
 
+
             try {
-                if (f.createNewFile()){
+                if (f.createNewFile() && f.toString().endsWith("txt")){
                 Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f)));
                 writer.write(model.getBoard().getTurn().getType() + "\n");
                 for (Cell[] row : model.getBoard().board) {
@@ -338,22 +351,30 @@ public class View {
                     }
                     writer.write(line.toString().strip() + "\n");
                 }
-                writer.close();
+                //writer.close();
                 File myObj = new File("boards", this.saveFileNameTextField.getText());
 
 //             myObj = new File(x);
                 model.getBoard().saveBoard(myObj);
+                saveFileErrorLabel.setText(saveFileSuccess.toString());
                 writer.close();
                 }
-
+               
                 else {
-                    saveFileErrorLabel.setText(saveFileExistsError.toString());
+                	saveFileErrorLabel.setText(saveFileExistsError.toString());
                 }
+
+                
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+                
 
             }
+        }
+    	else {
+            saveFileErrorLabel.setText(saveFileNotTxtError.toString());
+           
         }
     }
 

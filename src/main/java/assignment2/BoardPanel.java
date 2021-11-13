@@ -91,9 +91,7 @@ public class BoardPanel extends GridPane implements EventHandler<ActionEvent> {
      */
     protected void updateCells(){ // TODO
     	this.disableAllCells();
-    	//System.out.println(view.model.getBoard().getTurn() == Piece.Type.MUSKETEER);
-    	//System.out.println(view.model.getMusketeerAgent());
-    	
+   
     	if ((view.model.getBoard().getTurn() == Piece.Type.MUSKETEER) && (view.model.getMusketeerAgent() instanceof HumanAgent) ){
 	    	for (Cell i: view.model.getBoard().getPossibleCells()) {
 	    		//if (view.model.getBoard().getPossibleCells().contains(i)) { 
@@ -103,8 +101,10 @@ public class BoardPanel extends GridPane implements EventHandler<ActionEvent> {
 	    		if (currentSelect != null) {
 	    			for (Cell ii: view.model.getBoard().getPossibleDestinations(currentSelect)) {
 	    				ii.setDisable(false);
+	    				this.currentSelect.setDisable(true);
 	    			
 	    			}
+	    			
 	    		}
 	    	}
     	}
@@ -120,6 +120,7 @@ public class BoardPanel extends GridPane implements EventHandler<ActionEvent> {
 
 		    			for (Cell ii: view.model.getBoard().getPossibleDestinations(currentSelect)) {
 		    				ii.setDisable(false);
+		    				this.currentSelect.setDisable(true);
 		    			
 		    				
 		    			}
@@ -132,6 +133,7 @@ public class BoardPanel extends GridPane implements EventHandler<ActionEvent> {
     		this.gameOver();
     
     	}
+
     	
     }
     
@@ -142,6 +144,7 @@ public class BoardPanel extends GridPane implements EventHandler<ActionEvent> {
     	for (Cell i: view.model.getBoard().getAllCells()) {
     		i.setDisable(true);
     		}
+    	
     	}
     
     /**
@@ -159,6 +162,8 @@ public class BoardPanel extends GridPane implements EventHandler<ActionEvent> {
     	if (this.currentSelect == null) {
 	    	if (view.model.getBoard().getPossibleCells().contains(hi)) {
 	    		this.currentSelect = hi;
+	    		this.currentSelect.setDisable(false);
+	    		hi.setDisable(false);
 	    		updateCells();
 	    		view.runMove();
 	    	}
@@ -182,6 +187,7 @@ public class BoardPanel extends GridPane implements EventHandler<ActionEvent> {
     		}
 
     	}
+
     }
     public void gameOver() {
     	this.disableAllCells();

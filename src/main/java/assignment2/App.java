@@ -17,6 +17,7 @@ public class App extends Application {
         stage.setTitle("Three Musketeers");
         stage.setMinHeight(900);
         stage.setMinWidth(600);
+ 
         stage.getIcons().add(new Image("file:images/musketeer.png"));
 
         this.model = new ThreeMusketeers();
