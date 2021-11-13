@@ -20,6 +20,7 @@ public class Move {
      * @param move a Move to make a copy of
      */
     public Move(Move move) {
+    	
         this.fromCell = new Cell(move.fromCell);
         this.toCell = new Cell(move.toCell);
     }

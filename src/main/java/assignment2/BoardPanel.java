@@ -1,14 +1,22 @@
 package assignment2;
 
+import java.util.List;
+
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 
 public class BoardPanel extends GridPane implements EventHandler<ActionEvent> {
 
     private final View view;
     private final Board board;
+    private Cell currentSelect;
+    
 
     /**
      * Constructs a new GridPane that contains a Cell for each position in the board
@@ -20,6 +28,7 @@ public class BoardPanel extends GridPane implements EventHandler<ActionEvent> {
     public BoardPanel(View view, Board board) {
         this.view = view;
         this.board = board;
+        this.currentSelect = null;
 
         // Can modify styling
         this.setAlignment(Pos.CENTER);
@@ -32,14 +41,36 @@ public class BoardPanel extends GridPane implements EventHandler<ActionEvent> {
         setupBoard();
         updateCells();
     }
+    
+    public void changeCurrectSelect() {
+    	this.currentSelect = null;
+    }
+    public Cell getCurrentSelect() {
+    	return this.currentSelect;
+    }
 
 
     /**
      * Setup the BoardPanel with Cells
      */
     private void setupBoard(){ // TODO
+    	
+    	List<Cell> hi = board.getAllCells();
 
-    }
+    	for (Cell cell: hi) {
+    		this.add(cell, cell.getCoordinate().col, cell.getCoordinate().row);
+    		cell.setDisable(false);
+    		cell.setOnAction(e -> handle(e));
+    		this.setHalignment(cell, HPos.CENTER);
+
+    		
+    		
+    			
+    		}
+    		
+    	}
+
+    
 
     /**
      * Updates the BoardPanel to represent the board with the latest information
@@ -59,9 +90,60 @@ public class BoardPanel extends GridPane implements EventHandler<ActionEvent> {
      *      - disable all cells
      */
     protected void updateCells(){ // TODO
+    	this.disableAllCells();
+    	//System.out.println(view.model.getBoard().getTurn() == Piece.Type.MUSKETEER);
+    	//System.out.println(view.model.getMusketeerAgent());
+    	
+    	if ((view.model.getBoard().getTurn() == Piece.Type.MUSKETEER) && (view.model.getMusketeerAgent() instanceof HumanAgent) ){
+	    	for (Cell i: view.model.getBoard().getPossibleCells()) {
+	    		//if (view.model.getBoard().getPossibleCells().contains(i)) { 
+	    			i.setDisable(false);
+	    		//}
+	    		
+	    		if (currentSelect != null) {
+	    			for (Cell ii: view.model.getBoard().getPossibleDestinations(currentSelect)) {
+	    				ii.setDisable(false);
+	    			
+	    			}
+	    		}
+	    	}
+    	}
+	    		
+    		
+    	
+    	
+    	if ((view.model.getBoard().getTurn() == Piece.Type.GUARD) && (view.model.getGuardAgent() instanceof HumanAgent)) {
+	    		for (Cell i: view.model.getBoard().getPossibleCells()) {
+	    			i.setDisable(false);
 
+		    		if (currentSelect != null) {
+
+		    			for (Cell ii: view.model.getBoard().getPossibleDestinations(currentSelect)) {
+		    				ii.setDisable(false);
+		    			
+		    				
+		    			}
+		    		}
+	    		}
+    	}
+    	if (view.model.getBoard().isGameOver()) {
+    		
+    		//view.setMessageLabel((view.model.getBoard().getWinner()).toString() + "WON");
+    		this.gameOver();
+    
+    	}
+    	
     }
+    
 
+
+    
+    public void disableAllCells() {
+    	for (Cell i: view.model.getBoard().getAllCells()) {
+    		i.setDisable(true);
+    		}
+    	}
+    
     /**
      * Handles Cell clicks and updates the board accordingly
      * When a Cell gets clicked the following must be handled:
@@ -71,6 +153,37 @@ public class BoardPanel extends GridPane implements EventHandler<ActionEvent> {
      */
     @Override
     public void handle(ActionEvent actionEvent) { // TODO
+    	Cell hi =(Cell) actionEvent.getSource();
+    	
+    	
+    	if (this.currentSelect == null) {
+	    	if (view.model.getBoard().getPossibleCells().contains(hi)) {
+	    		this.currentSelect = hi;
+	    		updateCells();
+	    		view.runMove();
+	    	}
+	    	
+	    	
+	    	
+    	}
+    	else {
+    		if (this.currentSelect.getPiece().getType() != view.model.getBoard().getTurn()) {
+    			currentSelect = null;
+    		}
+    		
+    		if (view.model.getBoard().getPossibleDestinations(this.currentSelect).contains(hi)) {
+    			Move move = new Move( this.currentSelect, hi);
+    			view.model.move(move);
+    			currentSelect = null;
+    			updateCells();
+    			view.runMove();
+    			
+    			
+    		}
 
+    	}
+    }
+    public void gameOver() {
+    	this.disableAllCells();
     }
 }

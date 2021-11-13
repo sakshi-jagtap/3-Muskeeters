@@ -1,10 +1,15 @@
 package assignment2;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -96,8 +101,29 @@ public class ModeInputPanel extends GridPane {
      * @param listView ListView to update
      * @return the index in the listView of Starter.txt
      */
-    private int getFiles(ListView<String> listView) { // TODO
-        return 0;
+    private int getFiles(ListView<String> listView) {// TODO
+    	int index = -1 ;
+    	String dirName = ("boards");
+        try {
+            for (Path path : Files.newDirectoryStream(Paths.get(dirName), 
+                        path -> path.toFile().isFile())) {
+            	index = index + 1;
+            	if (path.toFile().getName() == "Starter.txt" ) {
+            		int starter = index; 
+            	}
+            	
+ 
+                path = path.normalize();
+                listView.getItems().add(path.toFile().getName());
+                
+               
+            }
+        } catch (IOException e) {
+            // Error while reading the directory
+        }
+
+    	return index;
+    	
     }
 
     /**
@@ -106,6 +132,32 @@ public class ModeInputPanel extends GridPane {
      * @param boardsList a ListView populated with boards to load
      */
     private void selectBoard(Label selectBoardLabel, ListView<String> boardsList) { // TODO
+    	String hi = boardsList.getSelectionModel().getSelectedItem();
+    	
+    	
+   
+
+
+    	String dirName = ("boards");
+        try {
+            for (Path path : Files.newDirectoryStream(Paths.get(dirName), 
+                        path -> path.toFile().isFile())) {
+
+            	
+ 
+                path = path.normalize();
+                if (path.toFile().getName().toString().equals(hi.toString())) {
+                	view.model.setBoard(path.toFile());
+                	selectBoardLabel.setText(path.toFile().getName());
+                }
+            }
+        } catch (IOException e) {
+            // Error while reading the directory
+        }
+        
+        
+
+    	
 
     }
 }

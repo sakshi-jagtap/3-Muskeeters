@@ -14,9 +14,16 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+
 
 public class View {
 
@@ -159,6 +166,26 @@ public class View {
     protected void setMessageLabel(String messageLabel) {
         this.messageLabel.setText(messageLabel);
     }
+    
+    public void getMessageeeLabel(String messageLabell) {
+    	
+    	try { 
+	    	if (model.getBoard().isGameOver()) {
+	    		setMessageLabel (model.getBoard().getWinner().toString() + " WON" ) ;
+	    	}
+	    	else { 
+	    		if (this.boardPanel.getCurrentSelect() == null) { 
+	    			setMessageLabel ("[" + messageLabell + " Turn]" + " Select a piece");
+	    		} 
+	    		else {
+	    			setMessageLabel ("[" + messageLabell + " Turn]" + " Select a move");
+	    		}
+	    	}
+    	}
+    	catch (Exception NullPointerException) {
+    		
+    	}
+    }
 
     /**
      * Handles running a move for both Human and Computer agents
@@ -171,14 +198,53 @@ public class View {
      *
      */
     protected void runMove() { // TODO
-
-    }
+    	try { 
+    		model.move(model.getCurrentAgent());
+    	} 
+		
+		catch (Exception NullPointerException) {
+			
+		}
+    	Agent currentAgent = model.getCurrentAgent();
+    	Board board = model.getBoard();
+        if(!board.isGameOver()) {
+        	try { 
+        		model.move(currentAgent);
+        	} 
+        	catch (Exception NullPointerException) {
+        		
+        	}
+        	
+        }
+        
+		this.boardPanel.updateCells();
+		if (board.isGameOver()){
+			boardPanel.gameOver();
+		}
+		
+		if (model.getBoard().getTurn() == Piece.Type.MUSKETEER) {
+			getMessageeeLabel("MUSKETEER");
+			//this.boardPanel.changeCurrectSelect();
+		}
+		else {
+			getMessageeeLabel("GUARD");
+			//this.boardPanel.changeCurrectSelect();
+		}
+		
+		
+		
+    }    
 
     /**
      *  Enables or disables the undo button depending on if there are moves to undo
      */
     protected void setUndoButton() { // TODO
-
+    	if (model.getMovesSize() == 0) {
+    		undoButton.disableProperty();
+    	}
+    	else {
+    		undoButton.setDisable(false);
+    	}
     }
 
 
@@ -188,6 +254,22 @@ public class View {
      * @param mode the selected GameMode
      */
     protected void setGameMode(ThreeMusketeers.GameMode mode) { // TODO
+    	this.gameMode = mode;
+
+    	if (mode.toString() == "Human") {
+    		this.showBoard();
+    		this.setSide(Piece.Type.MUSKETEER);
+    		this.setSide(Piece.Type.GUARD);
+
+    		
+    		
+    	}
+    	else {
+    		this.showSideSelector();
+ 
+    	}
+    	
+
 
     }
 
@@ -198,6 +280,19 @@ public class View {
      * @param sideType the selected Piece Type for the human player in Human vs Computer games
      */
     protected void setSide(Piece.Type sideType) { // TODO
+    	
+    	if (sideType == Piece.Type.MUSKETEER) {
+    		this.getMessageeeLabel("MUSKETEER");
+    		model.selectMode(this.gameMode, Piece.Type.MUSKETEER);
+    		
+    	}
+    	else {
+    		this.getMessageeeLabel("GUARD");
+    		model.selectMode(this.gameMode, Piece.Type.GUARD);
+    	}
+    	this.showBoard();
+    	
+    	
 
     }
 
@@ -207,6 +302,8 @@ public class View {
      * Undoes the latest move
      */
     private void undo() { // TODO
+    	model.undoMove();
+    	this.boardPanel.updateCells();
 
     }
 
@@ -220,8 +317,47 @@ public class View {
      * Must use saveFileSuccess, saveFileExistsError, or saveFileNotTxtError to set as the text of saveFileErrorLabel
      */
     private void saveBoard() { // TODO
+    	if (this.saveFileNameTextField.getText().endsWith(".txt")) {
+            String path = "boards" + File.separator + this.saveFileNameTextField.getText();
 
+            File f = new File(path);
+
+            try {
+                if (f.createNewFile()){
+                Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f)));
+                writer.write(model.getBoard().getTurn().getType() + "\n");
+                for (Cell[] row : model.getBoard().board) {
+                    StringBuilder line = new StringBuilder();
+                    for (Cell cell : row) {
+                        if (cell.getPiece() != null) {
+                            line.append(cell.getPiece().getSymbol());
+                        } else {
+                            line.append("_");
+                        }
+                        line.append(" ");
+                    }
+                    writer.write(line.toString().strip() + "\n");
+                }
+                writer.close();
+                File myObj = new File("boards", this.saveFileNameTextField.getText());
+
+//             myObj = new File(x);
+                model.getBoard().saveBoard(myObj);
+                writer.close();
+                }
+
+                else {
+                    saveFileErrorLabel.setText(saveFileExistsError.toString());
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+
+            }
+        }
     }
+
+    
 
     /**
      * The handler for the New Game button
@@ -229,6 +365,11 @@ public class View {
      * A new game is created and the main menu must be shown again
      */
     private void restart() { // TODO
+    	this.showMainMenu();
+    	initUI();
+    	
+
+    	
 
     }
 

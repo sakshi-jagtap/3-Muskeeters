@@ -45,6 +45,17 @@ public class SideInputPanel extends GridPane implements EventHandler<ActionEvent
      */
     @Override
     public void handle(ActionEvent actionEvent) { // TODO
+    	Button sourse = (Button)actionEvent.getSource();
+    	String hi = sourse.getText();
+    	if (hi == Piece.Type.MUSKETEER.toString()) {
+    		 view.setSide(Piece.Type.MUSKETEER);
+    	}
+    	else {
+    		view.setSide(Piece.Type.GUARD);
+    	}
+    	
+    	
+    	
 
     }
 }
