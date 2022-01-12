@@ -5,7 +5,7 @@ To run:
 - git clone https://github.com/sakshi-jagtap/3-Muskeeteers.git
 - run "java src/main/java/assignment2/App.java" in cmd
 
-##Game rules:
+## Game rules:
 - you can save the current board by clicking "Save board" and entering the name, and then come back to it later
 - TURNS - The Musketeers always go first. Each player makes one move before passing to their opponent.
 - MUSKETEER (X) - On the Musketeers’ turn, a musketeer can move to an adjacent orthogonal (neighboring, non-diagonal) cell occupied by a guard, capturing it and occupying that cell.
